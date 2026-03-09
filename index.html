@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>TRON // LIGHT CYCLES</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ══════════════ HEADER ══════════════ -->
+  <div id="header">
+    <div id="title">LIGHT CYCLES</div>
+    <div id="subtitle">End of line</div>
+  </div>
+
+  <!-- ══════════════ GAME AREA ══════════════ -->
+  <div id="game-container">
+
+    <!-- Canvas wrapper (maintains 4:3 aspect ratio via CSS) -->
+    <div id="canvas-wrap">
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- Start / Game-Over overlay -->
+      <div id="overlay">
+        <div id="overlay-title" style="color:var(--cyan); text-shadow:var(--glow-cyan);">
+          LIGHT CYCLES
+        </div>
+        <div id="overlay-subtitle">SELECT DIFFICULTY</div>
+
+        <!-- Difficulty selector -->
+        <div id="diff-row">
+          <button class="diff-btn easy"            onclick="selectDiff('easy')">EASY</button>
+          <button class="diff-btn normal selected"  onclick="selectDiff('normal')">NORMAL</button>
+          <button class="diff-btn hard"            onclick="selectDiff('hard')">HARD</button>
+        </div>
+
+        <button id="restart-btn" onclick="startGame()">INITIALIZE</button>
+
+        <div class="controls-hint">
+          WASD / ARROW KEYS — CHANGE DIRECTION<br>
+          AVOID WALLS &bull; AVOID ALL TRAILS
+        </div>
+      </div>
+    </div>
+
+    <!-- HUD bar below canvas -->
+    <div id="hud">
+      <div class="hud-player">▶ PLAYER &nbsp;<span id="score">000</span></div>
+      <span id="diff-label">NORMAL</span>
+      <div id="speed-bar-container">
+        SPD
+        <div id="speed-bar"><div id="speed-fill"></div></div>
+      </div>
+      <div class="hud-ai">CPU-<span id="ai-count">3</span> ◀</div>
+    </div>
+
+  </div><!-- /#game-container -->
+
+  <!-- ══════════════ D-PAD CONTROLLER ══════════════ -->
+  <div id="dpad-wrap">
+
+    <!-- UP -->
+    <div class="dpad-row">
+      <button class="dpad-btn up" id="btn-up"
+        ontouchstart="dpadPress('UP',event)"   ontouchend="dpadRelease('up',event)"
+        onmousedown="dpadPress('UP',event)"    onmouseup="dpadRelease('up',event)">
+        <svg viewBox="0 0 24 24"><path d="M12 4 L20 16 L4 16 Z"/></svg>
+      </button>
+    </div>
+
+    <!-- LEFT · CENTER · RIGHT -->
+    <div class="dpad-row">
+      <button class="dpad-btn left" id="btn-left"
+        ontouchstart="dpadPress('LEFT',event)"  ontouchend="dpadRelease('left',event)"
+        onmousedown="dpadPress('LEFT',event)"   onmouseup="dpadRelease('left',event)">
+        <svg viewBox="0 0 24 24"><path d="M4 12 L16 4 L16 20 Z"/></svg>
+      </button>
+
+      <div class="dpad-center">
+        <div class="dpad-center-dot"></div>
+      </div>
+
+      <button class="dpad-btn right" id="btn-right"
+        ontouchstart="dpadPress('RIGHT',event)" ontouchend="dpadRelease('right',event)"
+        onmousedown="dpadPress('RIGHT',event)"  onmouseup="dpadRelease('right',event)">
+        <svg viewBox="0 0 24 24"><path d="M20 12 L8 4 L8 20 Z"/></svg>
+      </button>
+    </div>
+
+    <!-- DOWN -->
+    <div class="dpad-row">
+      <button class="dpad-btn down" id="btn-down"
+        ontouchstart="dpadPress('DOWN',event)"  ontouchend="dpadRelease('down',event)"
+        onmousedown="dpadPress('DOWN',event)"   onmouseup="dpadRelease('down',event)">
+        <svg viewBox="0 0 24 24"><path d="M12 20 L4 8 L20 8 Z"/></svg>
+      </button>
+    </div>
+
+  </div><!-- /#dpad-wrap -->
+
+  <div id="dpad-label">DIRECTIONAL CONTROL</div>
+
+  <!-- Game logic loaded last so DOM is ready -->
+  <script src="game.js"></script>
+
+</body>
+</html>

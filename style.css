@@ -1,0 +1,401 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+/* ── VARIABLES ───────────────────────────────── */
+:root {
+  --cyan:        #00f5ff;
+  --orange:      #ff6a00;
+  --purple:      #bf00ff;
+  --green:       #00ff88;
+  --bg:          #020810;
+  --glow-cyan:   0 0 8px #00f5ff, 0 0 20px #00f5ff55;
+  --glow-orange: 0 0 8px #ff6a00, 0 0 20px #ff6a0055;
+}
+
+/* ── RESET ───────────────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── BASE ────────────────────────────────────── */
+body {
+  background: var(--bg);
+  color: var(--cyan);
+  font-family: 'Share Tech Mono', monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 10px 8px 24px;
+}
+
+/* Scanlines overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+}
+
+/* Vignette overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.75) 100%);
+}
+
+/* ── HEADER ──────────────────────────────────── */
+#header {
+  text-align: center;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 10;
+}
+
+#title {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: clamp(16px, 5vw, 36px);
+  letter-spacing: 0.3em;
+  color: var(--cyan);
+  text-shadow: var(--glow-cyan);
+  text-transform: uppercase;
+  animation: flicker 6s infinite;
+}
+
+#subtitle {
+  font-size: 10px;
+  letter-spacing: 0.45em;
+  color: rgba(0,245,255,0.45);
+  margin-top: 3px;
+  text-transform: uppercase;
+}
+
+/* ── GAME CONTAINER ──────────────────────────── */
+#game-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Canvas wrapper — maintains 4:3 aspect ratio (100:75) */
+#canvas-wrap {
+  position: relative;
+  width: 100%;
+  padding-bottom: 75%;
+  overflow: hidden;
+  border: 1px solid rgba(0,245,255,0.25);
+  box-shadow:
+    0 0 0 1px rgba(0,245,255,0.08),
+    0 0 30px rgba(0,245,255,0.12),
+    0 0 80px rgba(0,245,255,0.05);
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── HUD ─────────────────────────────────────── */
+#hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  margin-top: 7px;
+  padding: 0 2px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+.hud-player { color: var(--cyan);   text-shadow: var(--glow-cyan);   }
+.hud-ai     { color: var(--orange); text-shadow: var(--glow-orange); }
+
+#diff-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  opacity: 0.5;
+}
+
+#speed-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: rgba(0,245,255,0.5);
+}
+
+#speed-bar {
+  width: 60px;
+  height: 3px;
+  background: rgba(0,245,255,0.1);
+  border: 1px solid rgba(0,245,255,0.2);
+  overflow: hidden;
+}
+
+#speed-fill {
+  height: 100%;
+  background: var(--cyan);
+  box-shadow: 0 0 6px var(--cyan);
+  transition: width 0.5s ease;
+  width: 4%;
+}
+
+/* ══════════════════════════════════════════════
+   D-PAD CONTROLLER
+══════════════════════════════════════════════ */
+#dpad-wrap {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  position: relative;
+  z-index: 10;
+  filter: drop-shadow(0 0 18px rgba(0,245,255,0.18));
+}
+
+.dpad-row {
+  display: flex;
+  gap: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Base button style */
+.dpad-btn {
+  width:  clamp(56px, 14vw, 72px);
+  height: clamp(56px, 14vw, 72px);
+  background: rgba(0,245,255,0.05);
+  border: 1px solid rgba(0,245,255,0.30);
+  color: var(--cyan);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition: background 0.08s, box-shadow 0.08s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Diagonal shine gradient inside button */
+.dpad-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0,245,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Unique hexagonal clip-path per direction */
+.dpad-btn.up    { clip-path: polygon(20% 0%, 80% 0%, 100% 40%, 100% 100%, 0% 100%, 0% 40%);  }
+.dpad-btn.down  { clip-path: polygon(0% 0%, 100% 0%, 100% 60%, 80% 100%, 20% 100%, 0% 60%);  }
+.dpad-btn.left  { clip-path: polygon(0% 20%, 40% 0%, 100% 0%, 100% 100%, 40% 100%, 0% 80%);  }
+.dpad-btn.right { clip-path: polygon(0% 0%, 60% 0%, 100% 20%, 100% 80%, 60% 100%, 0% 100%);  }
+
+/* Centre connector piece */
+.dpad-center {
+  width:  clamp(56px, 14vw, 72px);
+  height: clamp(56px, 14vw, 72px);
+  background: rgba(0,245,255,0.03);
+  border: 1px solid rgba(0,245,255,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.dpad-center-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(0,245,255,0.4);
+  box-shadow: 0 0 8px var(--cyan);
+}
+
+/* Arrow icon */
+.dpad-btn svg {
+  width: 28%;
+  height: 28%;
+  fill: var(--cyan);
+  filter: drop-shadow(0 0 4px var(--cyan));
+  transition: transform 0.08s;
+}
+
+/* Press state — touch & class */
+.dpad-btn:active,
+.dpad-btn.pressed {
+  background: rgba(0,245,255,0.18);
+  box-shadow:
+    inset 0 0 16px rgba(0,245,255,0.25),
+    0 0 12px rgba(0,245,255,0.4);
+}
+
+.dpad-btn:active svg,
+.dpad-btn.pressed svg {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 8px var(--cyan));
+}
+
+/* Scan-line shimmer animation on each button */
+.dpad-btn::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to bottom, transparent, rgba(0,245,255,0.08), transparent);
+  animation: btnShimmer 3s linear infinite;
+  pointer-events: none;
+}
+
+#dpad-label {
+  margin-top: 10px;
+  font-size: 9px;
+  letter-spacing: 0.35em;
+  color: rgba(0,245,255,0.25);
+  text-transform: uppercase;
+}
+
+/* ── OVERLAY (start / game-over screen) ─────── */
+#overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2,8,16,0.92);
+  backdrop-filter: blur(2px);
+}
+
+#overlay.hidden { display: none; }
+
+#overlay-title {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: clamp(22px, 7vw, 52px);
+  letter-spacing: 0.3em;
+  margin-bottom: 6px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+#overlay-subtitle {
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  margin-bottom: 22px;
+  opacity: 0.6;
+  text-align: center;
+  padding: 0 10px;
+}
+
+/* Difficulty buttons row */
+#diff-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.diff-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  padding: 9px 16px;
+  background: transparent;
+  cursor: pointer;
+  text-transform: uppercase;
+  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  transition: all 0.18s;
+}
+
+.diff-btn.easy   { border: 1px solid var(--green);  color: var(--green);  }
+.diff-btn.normal { border: 1px solid var(--cyan);   color: var(--cyan);   }
+.diff-btn.hard   { border: 1px solid var(--orange); color: var(--orange); }
+
+.diff-btn.easy.selected   { background: rgba(0,255,136,0.15);  box-shadow: 0 0 14px var(--green);  }
+.diff-btn.normal.selected { background: rgba(0,245,255,0.12);  box-shadow: 0 0 14px var(--cyan);   }
+.diff-btn.hard.selected   { background: rgba(255,106,0,0.15);  box-shadow: 0 0 14px var(--orange); }
+
+/* Start / Reboot button */
+#restart-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  padding: 13px 32px;
+  background: transparent;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow: var(--glow-cyan), inset 0 0 20px rgba(0,245,255,0.05);
+  transition: all 0.2s;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+}
+
+#restart-btn:hover {
+  background: rgba(0,245,255,0.1);
+  box-shadow: 0 0 16px #00f5ff, 0 0 40px #00f5ff55, inset 0 0 20px rgba(0,245,255,0.1);
+  transform: scale(1.04);
+}
+
+#restart-btn:active {
+  background: rgba(0,245,255,0.15);
+  transform: scale(0.97);
+}
+
+.controls-hint {
+  margin-top: 20px;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  opacity: 0.28;
+  text-align: center;
+  line-height: 2.1;
+}
+
+/* ── ANIMATIONS ──────────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1;    }
+  50%       { opacity: 0.45; }
+}
+
+@keyframes flicker {
+  0%,  100% { opacity: 1;    }
+  92%        { opacity: 1;    }
+  93%        { opacity: 0.35; }
+  94%        { opacity: 1;    }
+  97%        { opacity: 0.65; }
+  98%        { opacity: 1;    }
+}
+
+@keyframes btnShimmer {
+  to { top: 200%; }
+}
